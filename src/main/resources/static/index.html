@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Tattoo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="robots" content="noindex">
+    <script type="text/javascript" async="" src="tattoo.js"></script>
+</head>
+<body>
+<h1>Tattoo</h1>
+
+<p>Tagpro Automatic Tournament Online Organizer</p>
+
+<h3>You do frontend dev? You want to help out here?</h3>
+
+<p>Contact: <a href="https://www.reddit.com/user/Roj-Tagpro/">Roj</a> and on <a href="https://github.com/nosslin579/tattoo">Github</a></p>
+
+<div>
+    <h2>Instructions</h2>
+
+    <p>Join the group and type 'oi'. To sign up type 'join', to cancel type 'leave', to spectate type 'spec'.</p>
+
+    <p> New tournament is started each hour. Five minutes before a group is created where you can sign up. When sign up close Tattoo will assign players to a team and launch the game. After the game Tattoo needs to know the score. When asking for it just type in the format redscore-bluescore, e.g. 6-2. Now is time for next round. Tattoo will assign players to team by order of tournament result. #1 goes to red, #2 to blue, #3 red etc. Since this is repeated there will be one winner at the end.</p>
+
+    <p>Current result is announced after each game and can also be viewed here. No problem reading raw json? Right? Good!</p>
+
+    <p>Tournament can be found at <a href="http://tagpro-orbit.koalabeast.com/groups">Orbit</a></p>
+
+    <p>Note 1: that this is only a POC. From <a href="https://www.techopedia.com/definition/4066/proof-of-concept-poc">Techopedia</a>:</p>
+    <blockquote>The overall objective of POC is to find solutions to technical problems, such as how systems can be integrated or throughput can be achieved through a given configuration.</blockquote>
+    <p>Note 2: Tattoo has it has very limited functionality and known bugs. Consider helping evolve Tattoo with dev/test/community please let me know.</p>
+
+    <p>Note 3: Tattoo can't handle duplicate names so make sure you join with a unique name.</p>
+
+    <p>Remember: Everybody believes in Santa Claus, but <b>Roj believes in you!</b></p>
+</div>
+<div>
+    <button type="button" onclick="startTournament()">New tournament</button>
+    <button type="button" onclick="startTournament()">Sign up</button>
+    <div>
+        <h2>Status:</h2>
+<pre id="status">
+</pre>
+    </div>
+</div>
+</body>
+</html>
