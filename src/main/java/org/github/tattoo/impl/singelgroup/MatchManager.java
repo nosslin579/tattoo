@@ -15,7 +15,7 @@ class MatchManager {
 
     private final Deque<Match> matches = new ConcurrentLinkedDeque<>();
 
-    public Match create(List<Participant> participants) {
+    public Match create(List<Participant> participants, TournamentOptions options) {
         Match ret = new Match();
 
         List<Participant> participantsOrdered = participants.stream()
@@ -32,6 +32,10 @@ class MatchManager {
         List<Participant> reserve = new ArrayList<>(participants);
         reserve.removeAll(participantsOrdered);
         ret.setReservePlayers(reserve);
+
+        ret.setMap(options.getMaps().get(new Random().nextInt(options.getMaps().size())));
+        ret.setMaxLength(options.getLengthOfMatch());
+        ret.setCaps(options.getCaps());
 
         matches.add(ret);
         return ret;

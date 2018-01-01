@@ -9,6 +9,9 @@ public class Match {
     boolean finished = false;
     private MatchScore score;
     private List<Participant> reserve;
+    private String map;
+    private int maxLength;
+    private int caps;
 
     public boolean isFinished() {
         return finished;
@@ -36,5 +39,29 @@ public class Match {
 
     public List<Participant> getReserve() {
         return reserve;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+    }
+
+    public int getMaxLength() {
+        return maxLength;
+    }
+
+    public void setCaps(int caps) {
+        this.caps = caps;
+    }
+
+    public int getCaps() {
+        return caps;
     }
 }

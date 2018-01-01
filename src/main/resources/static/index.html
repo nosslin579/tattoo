@@ -1,46 +1,113 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en" ng-app="tournamentApp">
 <head>
     <title>Tattoo</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="robots" content="noindex">
-    <script type="text/javascript" async="" src="tattoo.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
+    <script type="text/javascript" src="tattoo.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 </head>
 <body>
-<h1>Tattoo</h1>
+<div class="container">
+    <h1 class="text-center">Tattoo</h1>
 
-<p>Tagpro Automatic Tournament Online Organizer</p>
+    <h6 class="text-center">Tagpro Automatic Tournament Online Organizer Contact:<a href="https://www.reddit.com/user/Roj-Tagpro/">Roj</a> and <a href="https://github.com/nosslin579/tattoo">Github</a></h6>
 
-<h3>You do frontend dev? You want to help out here?</h3>
+    <div class="row">
+        <div class="col-sm">
+            <h3>Commands</h3>
+            <ul class="list-group">
+                <li class="list-group-item">oi - Status</li>
+                <li class="list-group-item">join - Sign up</li>
+                <li class="list-group-item">leave - Cancel sign up</li>
+                <li class="list-group-item">spec - Spectate</li>
+            </ul>
+        </div>
+        <div class="col-sm">
+            <h3>Instructions</h3>
 
-<p>Contact: <a href="https://www.reddit.com/user/Roj-Tagpro/">Roj</a> and on <a href="https://github.com/nosslin579/tattoo">Github</a></p>
+            <p>New tournament is started each hour beginning with sign up's for ten minutes. When sign up close Tattoo will assign players to a team and launch the game. After the game Tattoo needs to know the score. When asking for it just type in the format redscore-bluescore, e.g. 6-2.</p>
 
-<div>
-    <h2>Instructions</h2>
+            <p>Now is time for next round. Tattoo will assign players to team by order of tournament result. #1 goes to red, #2 to blue, #3 red etc. Since this is repeated there will be one winner at the end.</p>
+        </div>
+        <div class="col-sm">
+            <h3>Results</h3>
 
-    <p>Join the group and type 'oi'. To sign up type 'join', to cancel type 'leave', to spectate type 'spec'.</p>
+            <p>Current result is announced after each game and can also be viewed below.</p>
 
-    <p> New tournament is started each hour. Five minutes before a group is created where you can sign up. When sign up close Tattoo will assign players to a team and launch the game. After the game Tattoo needs to know the score. When asking for it just type in the format redscore-bluescore, e.g. 6-2. Now is time for next round. Tattoo will assign players to team by order of tournament result. #1 goes to red, #2 to blue, #3 red etc. Since this is repeated there will be one winner at the end.</p>
+            <p>Tournament can be found at <a href="http://tagpro-orbit.koalabeast.com/groups">Orbit</a></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p>Tattoo can't handle duplicate names so make sure you join with a unique name.</p>
 
-    <p>Current result is announced after each game and can also be viewed here. No problem reading raw json? Right? Good!</p>
-
-    <p>Tournament can be found at <a href="http://tagpro-orbit.koalabeast.com/groups">Orbit</a></p>
-
-    <p>Note 1: that this is only a POC. From <a href="https://www.techopedia.com/definition/4066/proof-of-concept-poc">Techopedia</a>:</p>
-    <blockquote>The overall objective of POC is to find solutions to technical problems, such as how systems can be integrated or throughput can be achieved through a given configuration.</blockquote>
-    <p>Note 2: Tattoo has it has very limited functionality and known bugs. Consider helping evolve Tattoo with dev/test/community please let me know.</p>
-
-    <p>Note 3: Tattoo can't handle duplicate names so make sure you join with a unique name.</p>
-
-    <p>Remember: Everybody believes in Santa Claus, but <b>Roj believes in you!</b></p>
-</div>
-<div>
-    <button type="button" onclick="startTournament()">New tournament</button>
-    <button type="button" onclick="startTournament()">Sign up</button>
+            <p>Everybody believes in Santa Claus, but <b>Roj believes in you!</b></p>
+        </div>
+    </div>
     <div>
-        <h2>Status:</h2>
-<pre id="status">
-</pre>
+    </div>
+    <hr/>
+    <h1 class="text-center">Results</h1>
+
+    <div ng-controller="TournamentController as tournamentList">
+        <div class="row" ng-repeat="t in tournamentList.tournaments">
+            <div class="col">
+                <h2>{{t.options.name}}</h2>
+                <p>{{t.startTime}}</p>
+            </div>
+            <div class="col">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Points</th>
+                        <th scope="col">Games</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="pr in t.participantResult">
+                        <th scope="row">{{$index+1}}</th>
+                        <td>{{pr.participant.name}}</td>
+                        <td>{{pr.points}}</td>
+                        <td>{{pr.matchesPlayed}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Map</th>
+                        <th scope="col">Caps</th>
+                        <th scope="col">Length</th>
+                        <th scope="col">Red score</th>
+                        <th scope="col">Blue score</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="m in t.matches">
+                        <th scope="row">1</th>
+                        <td>{{m.map}}</td>
+                        <td>{{m.caps}}</td>
+                        <td>{{m.maxLength}}</td>
+                        <td>{{m.score.redScore}}</td>
+                        <td>{{m.score.blueScore}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <div>
+        <button type="button" class="btn btn-secondary" onclick="startTournament()">New tournament</button>
+        <button type="button" class="btn btn-secondary" onclick="startTournament()">Sign up</button>
     </div>
 </div>
 </body>

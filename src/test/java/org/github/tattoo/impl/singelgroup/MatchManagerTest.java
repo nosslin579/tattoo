@@ -1,7 +1,7 @@
 package org.github.tattoo.impl.singelgroup;
 
 
-import org.github.tattoo.impl.singelgroup.MatchManager;
+import org.github.tattoo.TournamentOptions;
 import org.github.tattoo.impl.singelgroup.model.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,10 +21,10 @@ public class MatchManagerTest {
                 .map(playerNumber -> new Participant("p" + playerNumber))
                 .collect(Collectors.toList());
 
-        matchManager.create(nineParticipants);
+        matchManager.create(nineParticipants, new TournamentOptions());
         matchManager.completeMatch(new MatchScore(2, 1));
 
-        matchManager.create(nineParticipants);
+        matchManager.create(nineParticipants, new TournamentOptions());
         matchManager.completeMatch(new MatchScore(2, 1));
 
         Assert.assertEquals(6, matchManager.getParticipantResult(nineParticipants.get(0)).getPoints());

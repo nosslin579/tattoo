@@ -1,6 +1,7 @@
 package org.github.tattoo;
 
 import org.github.tattoo.impl.singelgroup.SingleGroupTournament;
+import org.github.tattoo.impl.singelgroup.model.TournamentStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,24 +17,25 @@ import java.util.stream.Collectors;
 public class TattooManager {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final List<Tournament> tournaments = Collections.synchronizedList(new ArrayList<>());
+    private final List<SingleGroupTournament> tournaments = Collections.synchronizedList(new ArrayList<>());
 
-    @PostConstruct
+//    @PostConstruct
     public void startInitialTournament() {
         log.info("Starting tournament on start up");
         TournamentOptions options = new TournamentOptions();
         options.setTest(true);
         options.setName("Start " + this.hashCode());
+        options.setNumberOfMatches(1);
         startTournament(new SingleGroupTournament(options));
     }
 
-    @Scheduled(cron = "0 55 * * * *")
+//    @Scheduled(cron = "0 55 * * * *")
     public void startTournament() {
         log.info("Starting tournament by schedule");
         startTournament(new SingleGroupTournament());
     }
 
-    public Tournament startTournament(Tournament newTournament) {
+    public SingleGroupTournament startTournament(SingleGroupTournament newTournament) {
         tournaments.stream()
                 .filter(tournament -> !tournament.getTournamentEndFuture().isDone())
                 .forEach(tournament -> log.warn("Tournament not done {}", tournament));
@@ -44,9 +46,9 @@ public class TattooManager {
     }
 
 
-    public List<Object> getStatus() {
+    public List<TournamentStatus> getStatus() {
         return tournaments.stream()
-                .map(Tournament::getStatus)
+                .map(SingleGroupTournament::getStatus)
                 .collect(Collectors.toList());
     }
 }

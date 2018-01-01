@@ -11,10 +11,11 @@ import org.github.tattoo.socket.model.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.Random;
 import java.util.concurrent.*;
 
-public class SingleGroupTournament implements Tournament {
+public class SingleGroupTournament {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
@@ -23,7 +24,7 @@ public class SingleGroupTournament implements Tournament {
     private final MemberManager memberManager = new MemberManager();
     private final MatchManager matchManager = new MatchManager();
     private final ChatEmitterListener chatListener = new ChatEmitterListener();
-    private final CompletableFuture<Tournament> future = new CompletableFuture<>();
+    private final CompletableFuture<SingleGroupTournament> future = new CompletableFuture<>();
     private final TournamentOptions options;
 
     private GroupCommand groupCommand;
@@ -33,6 +34,7 @@ public class SingleGroupTournament implements Tournament {
      * For debugging only, not used as any logic.
      */
     private volatile TournamentState tournamentState = TournamentState.CREATED;
+    private Instant startTime;
 
     public SingleGroupTournament(TournamentOptions options) {
         this.options = options;
@@ -55,10 +57,10 @@ public class SingleGroupTournament implements Tournament {
         ret.setChatListeners(chatListener.toString());
         ret.setCompleted(isComplete());
         ret.setSocketInfo(groupCommand.toString());
+        ret.setStartTime(startTime);
         return ret;
     }
 
-    @Override
     public void startTournament() {
         tournamentState = TournamentState.SIGN_UP_OPEN;
         group = SocketUtil.createGroup(options.getServer(), (id) -> tagProId = id, options.getName());
@@ -79,6 +81,7 @@ public class SingleGroupTournament implements Tournament {
         if (!options.isTest()) {
             pool.schedule(this::closeSignUp, 5, TimeUnit.MINUTES);
         }
+        this.startTime = Instant.now();
     }
 
     public void closeSignUp() {
@@ -106,11 +109,11 @@ public class SingleGroupTournament implements Tournament {
 
     private void setupMatch() {
         tournamentState = TournamentState.CREATING_MATCH;
-        Match match = matchManager.create(participantManager.getParticipants());
+        Match match = matchManager.create(participantManager.getParticipants(), options);
         memberManager.movePplToCorrectTeam(match, groupCommand::moveMemberToTeam);
-        groupCommand.setSettingMap(options.getMaps().get(new Random().nextInt(options.getMaps().size())));
-        groupCommand.setSettingTime(options.getLengthOfMatch());
-        groupCommand.setSettingCaps(options.getCaps());
+        groupCommand.setSettingMap(match.getMap());
+        groupCommand.setSettingTime(match.getMaxLength());
+        groupCommand.setSettingCaps(match.getCaps());
         groupCommand.chat("Launching match " + matchManager.getMatches().size() + " of " + options.getNumberOfMatches());
         pool.schedule(this::launch, 3, TimeUnit.SECONDS);
     }
@@ -181,7 +184,7 @@ public class SingleGroupTournament implements Tournament {
         }
     }
 
-    public CompletableFuture<Tournament> getTournamentEndFuture() {
+    public CompletableFuture<SingleGroupTournament> getTournamentEndFuture() {
         return future;
     }
 

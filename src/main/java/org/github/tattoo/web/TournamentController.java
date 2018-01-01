@@ -1,6 +1,7 @@
 package org.github.tattoo.web;
 
 import org.github.tattoo.TattooManager;
+import org.github.tattoo.impl.singelgroup.model.TournamentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,7 +19,7 @@ public class TournamentController {
     @RequestMapping(value = "/tournament",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Object> getStatus() {
+    public List<TournamentStatus> getStatus() {
         return manager.getStatus();
     }
 

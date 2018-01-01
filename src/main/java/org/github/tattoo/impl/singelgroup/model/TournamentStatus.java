@@ -4,6 +4,7 @@ import org.github.tattoo.TournamentOptions;
 import org.github.tattoo.impl.singelgroup.TournamentState;
 import org.github.tattoo.socket.model.Member;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class TournamentStatus {
     private String chatListeners;
     private boolean completed;
     private String socketInfo;
+    private Instant startTime;
 
     public void setParticipants(List<Participant> participants) {
         this.participants = participants;
@@ -106,5 +108,13 @@ public class TournamentStatus {
 
     public String getSocketInfo() {
         return socketInfo;
+    }
+
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public Instant getStartTime() {
+        return startTime;
     }
 }
