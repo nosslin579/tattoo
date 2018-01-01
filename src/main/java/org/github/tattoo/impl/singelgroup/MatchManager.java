@@ -70,7 +70,7 @@ class MatchManager {
                 .map(TeamMember::getParticipant)
                 .distinct()
                 .map(this::getParticipantResult)
-                .sorted((pr1, pr2) -> Integer.compare(pr1.getPoints(), pr2.getPoints()))
+                .sorted((pr1, pr2) -> Integer.compare(pr2.getPoints(), pr1.getPoints()))
                 .collect(Collectors.toList());
     }
 

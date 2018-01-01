@@ -53,7 +53,7 @@
     <h1 class="text-center">Results</h1>
 
     <div ng-controller="TournamentController as tournamentList">
-        <div class="row" ng-repeat="t in tournamentList.tournaments">
+        <div class="row" ng-repeat="t in tournamentList.tournaments | orderBy:'-'">
             <div class="col">
                 <h2>{{t.options.name}}</h2>
 
@@ -93,7 +93,7 @@
                     </thead>
                     <tbody>
                     <tr ng-repeat="m in t.matches">
-                        <th scope="row">1</th>
+                        <th scope="row">{{$index+1}}</th>
                         <td>{{m.map}}</td>
                         <td>{{m.caps}}</td>
                         <td>{{m.maxLength}}</td>

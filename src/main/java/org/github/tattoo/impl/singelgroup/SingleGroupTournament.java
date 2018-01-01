@@ -189,7 +189,7 @@ public class SingleGroupTournament {
     }
 
     public boolean isComplete() {
-        return matchManager.getMatches().stream().allMatch(Match::isFinished) && matchManager.getMatches().size() == options.getMaps().size();
+        return matchManager.getMatches().stream().allMatch(Match::isFinished) && matchManager.getMatches().size() == options.getNumberOfMatches();
     }
 
     @Override
