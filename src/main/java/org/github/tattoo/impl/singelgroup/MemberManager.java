@@ -90,24 +90,28 @@ class MemberManager {
     }
 
     public void movePplToCorrectTeam(Match match, BiConsumer<String, Integer> moveMemberToTeam) {
-        Deque<Participant> reserve = new ArrayDeque<>(match.getReserve());
-        for (TeamMember teamMember : match.getTeamMembers().values()) {
-            String name = teamMember.getParticipant().getName();
-            getMemberByName(name) //get from team
-                    .map(Optional::of)
-                    .orElseGet(() -> {//or get from reserve
-                        match.getTeamMembers().remove(name);
-                        if (reserve.isEmpty()) {
-                            return Optional.empty();
-                        }
-                        Participant reserveParticipant = reserve.pop();
-                        return getMemberByName(reserveParticipant.getName())
-                                .map(member -> {
-                                    match.getTeamMembers().put(member.getName(), new TeamMember(reserveParticipant, teamMember.getTeamId()));
-                                    return member;
-                                });
-                    })
-                    .ifPresent(member -> moveMemberToTeam.accept(member.getId(), teamMember.getTeamId())); //move if present
+        try {
+            Deque<Participant> reserve = new ArrayDeque<>(match.getReserve());
+            for (TeamMember teamMember : match.getTeamMembers().values()) {
+                String name = teamMember.getParticipant().getName();
+                getMemberByName(name) //get from team
+                        .map(Optional::of)
+                        .orElseGet(() -> {//or get from reserve
+                            match.getTeamMembers().remove(name);
+                            if (reserve.isEmpty()) {
+                                return Optional.empty();
+                            }
+                            Participant reserveParticipant = reserve.pop();
+                            return getMemberByName(reserveParticipant.getName())
+                                    .map(member -> {
+                                        match.getTeamMembers().put(member.getName(), new TeamMember(reserveParticipant, teamMember.getTeamId()));
+                                        return member;
+                                    });
+                        })
+                        .ifPresent(member -> moveMemberToTeam.accept(member.getId(), teamMember.getTeamId())); //move if present
+            }
+        } catch (Exception e) {
+            log.error("Could not move ppl", e);
         }
     }
 

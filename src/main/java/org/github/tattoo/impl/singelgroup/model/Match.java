@@ -1,5 +1,6 @@
 package org.github.tattoo.impl.singelgroup.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,7 @@ public class Match {
     private final Map<String, TeamMember> teamMembers = new HashMap<>();
     boolean finished = false;
     private MatchScore score;
-    private List<Participant> reserve;
+    private List<Participant> reserve = new ArrayList<>();
     private String map;
     private int maxLength;
     private int caps;

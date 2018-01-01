@@ -19,17 +19,17 @@ public class TattooManager {
 
     private final List<SingleGroupTournament> tournaments = Collections.synchronizedList(new ArrayList<>());
 
-//    @PostConstruct
+    @PostConstruct
     public void startInitialTournament() {
         log.info("Starting tournament on start up");
         TournamentOptions options = new TournamentOptions();
         options.setTest(true);
         options.setName("Start " + this.hashCode());
-        options.setNumberOfMatches(1);
+        options.setNumberOfMatches(2);
         startTournament(new SingleGroupTournament(options));
     }
 
-//    @Scheduled(cron = "0 55 * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void startTournament() {
         log.info("Starting tournament by schedule");
         startTournament(new SingleGroupTournament());
@@ -41,7 +41,13 @@ public class TattooManager {
                 .forEach(tournament -> log.warn("Tournament not done {}", tournament));
         tournaments.add(newTournament);
         newTournament.startTournament();
-        newTournament.getTournamentEndFuture().thenAccept(t -> log.info("Tournament ended {}", t));
+        newTournament.getTournamentEndFuture()
+                .thenAccept(t -> {
+                    log.info("Tournament ended {}", t);
+                    if (t.getStatus().getParticipants().isEmpty()) {
+                        tournaments.remove(t);
+                    }
+                });
         return newTournament;
     }
 

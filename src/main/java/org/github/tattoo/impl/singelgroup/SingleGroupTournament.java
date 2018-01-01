@@ -79,7 +79,7 @@ public class SingleGroupTournament {
         pool.scheduleAtFixedRate(this::timeoutTournament, 55, 1, TimeUnit.MINUTES);//using scheduleAtFixedRate() since schedule() blocks shutdown()
         pool.scheduleAtFixedRate(() -> checkIfConnected(groupSocket), 1, 1, TimeUnit.MINUTES);
         if (!options.isTest()) {
-            pool.schedule(this::closeSignUp, 5, TimeUnit.MINUTES);
+            pool.schedule(this::closeSignUp, 10, TimeUnit.MINUTES);
         }
         this.startTime = Instant.now();
     }
@@ -166,7 +166,7 @@ public class SingleGroupTournament {
             future.complete(this);
             groupCommand.disconnect();
         }, 10, TimeUnit.SECONDS);
-        pool.shutdown();//this will wait for task above to finish
+        pool.shutdown();
     }
 
     private void timeoutTournament() {
