@@ -1,76 +1,112 @@
 package org.github.tattoo;
 
-import org.github.tattoo.TagproServer;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.github.tattoo.singlegroup.model.Variant;
 
 public class TournamentOptions {
-    private final static AtomicInteger COUNTER = new AtomicInteger(1);
-    private TagproServer server = TagproServer.ORBIT;
-    private List<String> maps = Arrays.asList("Bulldog", "Market", "Trebuchet", "Apparition", "Cedar", "Cloud", "EMERALD ", "Gumbo",
-            "Pilot ", "Plasma", "Tehuitzingo ", "Transilio", "Wamble", "Wombo Combo", "GeoKoala ", "Hexane",
-            "Atomic ", "Bombing Run", "Command Center", "Convoy ", "Cosmic", "Dealer", "GamePad", "Thinking with Portals", "Volt");
-    private int caps = 1;
-    private int lengthOfMatch = 4;
-    public int numberOfMatches = 8;
-    private String name = "Tattoo " + COUNTER.getAndIncrement();
-    private boolean test = false;
+  private String serverId = "abb1f9f7c95a";
+  private int caps = 1;
+  private int lengthOfMatch = 4;
+  private int numberOfMatches = 0;
+  private String name = "Tattoo " + hashCode();
+  private long signUpWaitTime = 60;
+  private String map = "EMERALD";
+  private int maxPlayers = 12;
+  private Variant variant = Variant.CLASSIC;
+  private String schedule;//0 0 20 * * MON
 
-    public TagproServer getServer() {
-        return server;
-    }
+  public String getMap() {
+    return map;
+  }
 
-    public void setServer(TagproServer server) {
-        this.server = server;
-    }
+  public void setMap(String map) {
+    this.map = map;
+  }
 
-    public List<String> getMaps() {
-        return maps;
-    }
+  public int getCaps() {
+    return caps;
+  }
 
-    public void setMaps(List<String> maps) {
-        this.maps = maps;
-    }
+  public void setCaps(int caps) {
+    this.caps = caps;
+  }
 
-    public int getCaps() {
-        return caps;
-    }
+  public int getLengthOfMatch() {
+    return lengthOfMatch;
+  }
 
-    public void setCaps(int caps) {
-        this.caps = caps;
-    }
+  public void setLengthOfMatch(int lengthOfMatch) {
+    this.lengthOfMatch = lengthOfMatch;
+  }
 
-    public int getLengthOfMatch() {
-        return lengthOfMatch;
-    }
+  public int getNumberOfMatches() {
+    return numberOfMatches;
+  }
 
-    public void setLengthOfMatch(int lengthOfMatch) {
-        this.lengthOfMatch = lengthOfMatch;
-    }
+  public void setNumberOfMatches(int numberOfMatches) {
+    this.numberOfMatches = numberOfMatches;
+  }
 
-    public int getNumberOfMatches() {
-        return numberOfMatches;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setNumberOfMatches(int numberOfMatches) {
-        this.numberOfMatches = numberOfMatches;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public long getSignUpWaitTime() {
+    return signUpWaitTime;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setSignUpWaitTime(long signUpWaitTime) {
+    this.signUpWaitTime = signUpWaitTime;
+  }
 
-    public boolean isTest() {
-        return test;
-    }
+  public int getMaxPlayers() {
+    return maxPlayers;
+  }
 
-    public void setTest(boolean test) {
-        this.test = test;
-    }
+  public void setMaxPlayers(int maxPlayers) {
+    this.maxPlayers = maxPlayers;
+  }
+
+  public Variant getVariant() {
+    return variant;
+  }
+
+  public void setVariant(Variant variant) {
+    this.variant = variant;
+  }
+
+  public String getServerId() {
+    return serverId;
+  }
+
+  public void setServerId(String serverId) {
+    this.serverId = serverId;
+  }
+
+  public String getSchedule() {
+    return schedule;
+  }
+
+  public void setSchedule(String schedule) {
+    this.schedule = schedule;
+  }
+
+  @Override
+  public String toString() {
+    return "TournamentOptions{" +
+        "serverId='" + serverId + '\'' +
+        ", caps=" + caps +
+        ", lengthOfMatch=" + lengthOfMatch +
+        ", numberOfMatches=" + numberOfMatches +
+        ", name='" + name + '\'' +
+        ", signUpWaitTime=" + signUpWaitTime +
+        ", map='" + map + '\'' +
+        ", maxPlayers=" + maxPlayers +
+        ", variant=" + variant +
+        ", schedule='" + schedule + '\'' +
+        '}';
+  }
 }

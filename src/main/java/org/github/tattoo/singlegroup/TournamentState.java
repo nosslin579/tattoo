@@ -1,0 +1,19 @@
+package org.github.tattoo.singlegroup;
+
+public enum TournamentState {
+  CREATED,
+  SIGN_UP_OPEN,
+  SIGN_UP_CLOSED,
+  CREATING_MATCH,
+  ASK_READY_FOR_LAUNCH,
+  LAUNCHING,
+  MATCH_IN_PROGRESS,
+  MATCH_FINISHED,
+  UPDATING_SCORE,
+  GOT_SCORE,
+  TIME_OUT,
+  NOT_ENOUGH_MEMBERS,
+  NOT_ENOUGH_PARTICIPANTS,
+  ERROR,
+  ENDED
+}

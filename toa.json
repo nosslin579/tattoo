@@ -1,0 +1,26 @@
+[
+  {
+    "serverId": "abb1f9f7c95a",
+    "caps": 1,
+    "lengthOfMatch": 4,
+    "numberOfMatches": 8,
+    "name": "Tattoo 1",
+    "signUpWaitTime": 60,
+    "map": "EMERALD",
+    "maxPlayers": 12,
+    "variant": "CLASSIC",
+    "schedule": "0 0 20 * * MON"
+  },
+  {
+    "serverId": "abb1f9f7c95a",
+    "caps": 1,
+    "lengthOfMatch": 4,
+    "numberOfMatches": 8,
+    "name": "Tattoo 2",
+    "signUpWaitTime": 60,
+    "map": "EMERALD",
+    "maxPlayers": 12,
+    "variant": "CLASSIC",
+    "schedule": "0 0 20 * * MON"
+  }
+]

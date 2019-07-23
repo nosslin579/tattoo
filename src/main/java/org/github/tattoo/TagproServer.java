@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public enum TagproServer {
+    DEFAULT("https://tagpro.koalabeast.com", 443),
     ORBIT("http://tagpro-orbit.koalabeast.com", 443),
     CHORD("http://tagpro-CHORD.koalabeast.com", 443);
 
