@@ -5,11 +5,12 @@ import org.github.tattoo.singlegroup.model.Variant;
 public class TournamentOptions {
   private String serverId = "abb1f9f7c95a";
   private int caps = 1;
-  private int lengthOfMatch = 4;
-  private int numberOfMatches = 0;
-  private String name = "Tattoo " + hashCode();
+  private int lengthOfMatch = 1;
+  private int numberOfMatches = 2;
+  private String name = "Test" + hashCode();
   private long signUpWaitTime = 60;
   private String map = "EMERALD";
+  private int minPlayers = 2;
   private int maxPlayers = 12;
   private Variant variant = Variant.CLASSIC;
   private String schedule;//0 0 20 * * MON
@@ -108,5 +109,13 @@ public class TournamentOptions {
         ", variant=" + variant +
         ", schedule='" + schedule + '\'' +
         '}';
+  }
+
+  public int getMinPlayers() {
+    return minPlayers;
+  }
+
+  public void setMinPlayers(int minPlayers) {
+    this.minPlayers = minPlayers;
   }
 }

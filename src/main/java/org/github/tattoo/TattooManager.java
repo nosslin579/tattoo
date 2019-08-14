@@ -21,7 +21,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
@@ -36,25 +36,17 @@ public class TattooManager {
 
   private final List<SingleGroupTournament> tournaments = Collections.synchronizedList(new ArrayList<>());
   private final Gson gson = new Gson();
+  private ExecutorService onDemandTournamentPool = Executors.newSingleThreadExecutor();
 
   public TattooManager() throws FileNotFoundException {
-    Reader r = new FileReader("toa.json");//tournament options array
+    Reader r = new FileReader("schedule.json");
     tournamentOptions = gson.fromJson(r, TournamentOptions[].class);
   }
 
   @PostConstruct
   public void startInitialTournament() {
-    TournamentOptions options = null;
     if (false) {
-      log.info("Starting test tournament on start up");
-      options = new TournamentOptions();
-      options.setName("Test" + this.hashCode());
-      options.setNumberOfMatches(2);
-      CompletableFuture.supplyAsync(() -> singleGroupTournamentManager.runTournament(new SingleGroupTournament(options)), Executors.newSingleThreadExecutor());
-    }
-
-    if (false) {
-      SingleGroupTournament mockData = new SingleGroupTournament(options);
+      SingleGroupTournament mockData = new SingleGroupTournament(new TournamentOptions());
       Participant participant = new Participant("asdf", "qwer");
       mockData.getParticipants().add(participant);
       Match match = new Match();
@@ -69,10 +61,19 @@ public class TattooManager {
     }
   }
 
-  public void startTournament(TournamentOptions options) {
+  public void startTournamentAsync(TournamentOptions options) {
+    log.info("Starting tournament on demand, {}", options);
+    onDemandTournamentPool.submit(() -> startTournament(options));
+  }
+
+  private void startTournament(TournamentOptions options) {
     SingleGroupTournament tournament = new SingleGroupTournament(options);
     tournaments.add(tournament);
-    singleGroupTournamentManager.runTournament(tournament);
+    try {
+      singleGroupTournamentManager.runTournament(tournament);
+    } catch (Exception e) {
+      log.error("Failed to run tournament {}", options, e);
+    }
   }
 
   public List<SingleGroupTournament> getTournaments() {

@@ -80,7 +80,7 @@ public class SingleGroupTournamentManager {
     if (group.getMembers().size() < 4) {
       group.getCommand().chat("Tournament canceled since not enough ppl in here.");
       return TournamentState.NOT_ENOUGH_MEMBERS;
-    } else if (tournament.getParticipants().size() < 2) {
+    } else if (tournament.getParticipants().size() < tournament.getOptions().getMinPlayers()) {
       group.getCommand().chat("Tournament canceled since not enough ppl signed up.");
       return TournamentState.NOT_ENOUGH_PARTICIPANTS;
     }

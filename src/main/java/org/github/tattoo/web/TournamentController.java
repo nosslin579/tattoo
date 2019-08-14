@@ -4,6 +4,7 @@ import org.github.tattoo.TattooManager;
 import org.github.tattoo.TournamentOptions;
 import org.github.tattoo.singlegroup.SingleGroupTournament;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +22,11 @@ public class TournamentController {
   @RequestMapping(value = "/tournament", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public List<SingleGroupTournament> getTournament() {
     return manager.getTournaments();
+  }
+
+  @RequestMapping(value = "/tournament", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void startTournament(HttpEntity<TournamentOptions> entity) {
+    manager.startTournamentAsync(entity.getBody());
   }
 
   @RequestMapping(value = "/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
