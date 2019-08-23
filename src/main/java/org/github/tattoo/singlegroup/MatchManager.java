@@ -1,5 +1,6 @@
 package org.github.tattoo.singlegroup;
 
+import io.socket.client.Socket;
 import org.github.tattoo.TournamentException;
 import org.github.tattoo.Util;
 import org.github.tattoo.groupsocket.ChatEmitterListener;
@@ -43,17 +44,31 @@ public class MatchManager {
       Match match = createMatch(tournament, group);
 
       setupMatch(match, group, tournament);
-      if (!launch(tournament, match, group)) {
+      if (!isPLayersReady(tournament, match, group)) {
         group.getCommand().chat("Not ready?");
         group.getCommand().chat("Trying again");
         continue;
       }
 
-      if (isMatchCompletedSuccessfully(tournament, match, group)) {
-        updateScore(tournament, match, group);
+      tournament.setState(TournamentState.LAUNCHING);
+      group.getCommand().launch();
+      Util.sleepSeconds(2);
+      Socket joinerSocket = socketFactory.joinJoinerSocket(group.getTagProCookie());
+
+      if (isParticipantsAtLocation(match, group, Member.IN_GAME, 60)) {
+        joinerSocket.disconnect();
+        tournament.setState(TournamentState.MATCH_IN_PROGRESS);
       } else {
         group.getCommand().chat("Match did not start, replaying");
+        joinerSocket.disconnect();
+        continue;
       }
+
+      if (isParticipantsAtLocation(match, group, Member.IN_HERE, 60 * match.getMaxLength() + 60)) {
+        tournament.setState(TournamentState.MATCH_FINISHED);
+        updateScore(tournament, match, group);
+      }
+      joinerSocket.disconnect();//just in case
     }
     return ResultUtil.getParticipantResults(tournament);
   }
@@ -152,10 +167,11 @@ public class MatchManager {
     group.getCommand().setServer(tournament.getOptions().getServerId());
   }
 
-  private boolean launch(SingleGroupTournament tournament, Match match, Group group) {
+  private boolean isPLayersReady(SingleGroupTournament tournament, Match match, Group group) {
     log.info("Launching");
 
-    String message = "Launching " + (match.isQualification() ? "qualification-" : "end-") + "game " + match.getNumber() + " of " + tournament.getOptions().getNumberOfMatches();
+    String gameType = match.isQualification() ? "qualification-game " : "end-game ";
+    String message = "Launching " + gameType + match.getNumber() + " of " + tournament.getOptions().getNumberOfMatches();
     group.getCommand().chat(message);
     group.getCommand().chat("Ready?");
 
@@ -174,24 +190,11 @@ public class MatchManager {
     }
 
     chatListener.removeListener(readyChatListener);
-    if (!readyChatListener.isPlayersReady()) {
-      return false;
-    }
-    tournament.setState(TournamentState.LAUNCHING);
-    group.getCommand().launch();
-    Util.sleepSeconds(2);
-    socketFactory.joinJoinerSocket(group.getTagProCookie());
-    return true;
+    return readyChatListener.isPlayersReady();
   }
 
-  private boolean isMatchCompletedSuccessfully(SingleGroupTournament tournament, Match match, Group group) {
-    return isParticipantsAtLocation(tournament, match, group, Member.IN_GAME, TournamentState.MATCH_IN_PROGRESS, 80) &&
-        isParticipantsAtLocation(tournament, match, group, Member.IN_HERE, TournamentState.MATCH_FINISHED, 60 * 15);
-
-  }
-
-  private boolean isParticipantsAtLocation(SingleGroupTournament tournament, Match match, Group group, String location, TournamentState state, int maxWait) {
-    Instant threshHold = Instant.now().plusSeconds(maxWait);
+  private boolean isParticipantsAtLocation(Match match, Group group, String location, int maxWaitSeconds) {
+    Instant threshHold = Instant.now().plusSeconds(maxWaitSeconds);
 
     while (Instant.now().isBefore(threshHold)) {
       Util.sleepSeconds(2);
@@ -205,7 +208,6 @@ public class MatchManager {
           .count();
       double ratio = atLocation / (match.getRedTeam().getPlayers().size() + match.getRedTeam().getPlayers().size());
       if (atLocation > 6 || ratio > 0.74d) {
-        tournament.setState(state);
         log.info("Players at location {}", location);
         return true;
       }

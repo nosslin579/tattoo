@@ -37,6 +37,7 @@ public class SingleGroupMockConfig {
     Socket socket = Mockito.mock(Socket.class);
     Group group = new Group("name", "groupid", "cookie", members, socket, chatListener);
     Mockito.when(mock.createGroupSocket(Mockito.any())).thenReturn(group);
+    Mockito.when(mock.joinJoinerSocket(Mockito.any())).thenReturn(socket);
     return mock;
   }
 
