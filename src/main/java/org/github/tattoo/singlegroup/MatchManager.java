@@ -166,7 +166,7 @@ public class MatchManager {
     tournament.setState(TournamentState.ASK_READY_FOR_LAUNCH);
     synchronized (match) {
       try {
-        match.wait(TimeUnit.SECONDS.toMillis(1));
+        match.wait(TimeUnit.SECONDS.toMillis(30));
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         throw new TournamentException("Interrupted while waiting for ready", e);
