@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import org.github.tattoo.singlegroup.ResultUtil;
 import org.github.tattoo.singlegroup.SingleGroupTournament;
 import org.github.tattoo.singlegroup.SingleGroupTournamentManager;
-import org.github.tattoo.singlegroup.model.Match;
-import org.github.tattoo.singlegroup.model.Participant;
 import org.github.tattoo.web.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +15,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.Reader;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -27,7 +26,6 @@ import java.util.concurrent.Executors;
 @Component
 public class TattooManager {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-  private final TournamentOptions[] tournamentOptions;
 
   @Autowired
   private SingleGroupTournamentManager singleGroupTournamentManager;
@@ -38,24 +36,12 @@ public class TattooManager {
   private final Gson gson = new Gson();
   private ExecutorService onDemandTournamentPool = Executors.newSingleThreadExecutor();
 
-  public TattooManager() throws FileNotFoundException {
-    Reader r = new FileReader("schedule.json");
-    tournamentOptions = gson.fromJson(r, TournamentOptions[].class);
-  }
-
   @PostConstruct
-  public void startInitialTournament() {
-    if (false) {
-      SingleGroupTournament mockData = new SingleGroupTournament(new TournamentOptions());
-      Participant participant = new Participant("asdf", "qwer");
-      mockData.getParticipants().add(participant);
-      Match match = new Match();
-      match.getRedTeam().getPlayers().add(participant);
-      mockData.getCompletedMatches().add(match);
-      tournaments.add(mockData);
-    }
+  public void init() throws FileNotFoundException {
+    SingleGroupTournament[] tournaments = gson.fromJson(new FileReader("tournaments.json"), SingleGroupTournament[].class);
+    this.tournaments.addAll(Arrays.asList(tournaments));
 
-    for (TournamentOptions to : tournamentOptions) {
+    for (TournamentOptions to : getTournamentOptions()) {
       log.info("Scheduling tournament {}", to);
       taskScheduler.schedule(() -> startTournament(to), new CronTrigger(to.getSchedule()));
     }
@@ -71,6 +57,7 @@ public class TattooManager {
     tournaments.add(tournament);
     try {
       singleGroupTournamentManager.runTournament(tournament);
+      gson.toJson(tournaments, new FileWriter("tournaments.json"));
     } catch (Exception e) {
       log.error("Failed to run tournament {}", options, e);
     }
@@ -81,7 +68,11 @@ public class TattooManager {
   }
 
   public TournamentOptions[] getTournamentOptions() {
-    return tournamentOptions;
+    try {
+      return gson.fromJson(new FileReader("schedule.json"), TournamentOptions[].class);
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException("Failed to fetch schedule", e);
+    }
   }
 
   public Result[] getResults(int limit) {
