@@ -1,6 +1,8 @@
 package org.github.tattoo;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import org.github.tattoo.singlegroup.ResultUtil;
 import org.github.tattoo.singlegroup.SingleGroupTournament;
 import org.github.tattoo.singlegroup.SingleGroupTournamentManager;
@@ -19,6 +21,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,9 +35,11 @@ public class TattooManager {
   @Autowired
   private TaskScheduler taskScheduler;
 
+  private final ExecutorService onDemandTournamentPool = Executors.newSingleThreadExecutor();
   private final List<SingleGroupTournament> tournaments = Collections.synchronizedList(new ArrayList<>());
-  private final Gson gson = new Gson();
-  private ExecutorService onDemandTournamentPool = Executors.newSingleThreadExecutor();
+  private final Gson gson = new GsonBuilder()
+      .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
+      .create();
 
   @PostConstruct
   public void init() throws FileNotFoundException {

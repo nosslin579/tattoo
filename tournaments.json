@@ -1,1 +1,189 @@
-[]
+[
+  {
+    "options": {
+      "serverId": "abb1f9f7c95a",
+      "caps": 1,
+      "lengthOfMatch": 1,
+      "numberOfMatches": 2,
+      "name": "Test17238154",
+      "signUpWaitTime": 60,
+      "map": "EMERALD",
+      "minPlayers": 2,
+      "maxPlayers": 12,
+      "variant": "CLASSIC",
+      "schedule": null
+    },
+    "participants": [
+      {
+        "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
+        "name": ".",
+        "signUp": 1566583239001
+      },
+      {
+        "tagProId": "Za8Ky9Rltuz4_DyN2z02hpaFT-5ivmhW",
+        "name": "Tattoo",
+        "signUp": 1566583243803
+      }
+    ],
+    "state": "ENDED",
+    "startTime": 1566583211187,
+    "completedMatches": [
+      {
+        "map": "EMERALD",
+        "maxLength": 1,
+        "capLimit": 1,
+        "number": 1,
+        "redTeam": {
+          "players": [
+            {
+              "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
+              "name": ".",
+              "signUp": 1566583239001
+            }
+          ],
+          "caps": 1,
+          "name": "OHJIDPCTKCLF",
+          "teamId": 1
+        },
+        "blueTeam": {
+          "players": [
+            {
+              "tagProId": "Za8Ky9Rltuz4_DyN2z02hpaFT-5ivmhW",
+              "name": "Tattoo",
+              "signUp": 1566583243803
+            }
+          ],
+          "caps": 0,
+          "name": "LLGYQVUAVVLF",
+          "teamId": 2
+        },
+        "qualification": false
+      },
+      {
+        "map": "EMERALD",
+        "maxLength": 1,
+        "capLimit": 1,
+        "number": 2,
+        "redTeam": {
+          "players": [
+            {
+              "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
+              "name": ".",
+              "signUp": 1566583239001
+            }
+          ],
+          "caps": 1,
+          "name": "DMFUGIVGXULF",
+          "teamId": 1
+        },
+        "blueTeam": {
+          "players": [
+            {
+              "tagProId": "Za8Ky9Rltuz4_DyN2z02hpaFT-5ivmhW",
+              "name": "Tattoo",
+              "signUp": 1566583243803
+            }
+          ],
+          "caps": 0,
+          "name": "XIQEIYBNNUYP",
+          "teamId": 2
+        },
+        "qualification": false
+      }
+    ]
+  },
+  {
+    "options": {
+      "serverId": "abb1f9f7c95a",
+      "caps": 2,
+      "lengthOfMatch": 10,
+      "numberOfMatches": 8,
+      "name": "Atomic FFA",
+      "signUpWaitTime": 300,
+      "map": "Atomic",
+      "minPlayers": 8,
+      "maxPlayers": 12,
+      "variant": "CLASSIC",
+      "schedule": "0 0 20 * * FRI"
+    },
+    "participants": [],
+    "state": "NOT_ENOUGH_MEMBERS",
+    "startTime": 1566586800000,
+    "completedMatches": []
+  },
+  {
+    "options": {
+      "serverId": "abb1f9f7c95a",
+      "caps": 5,
+      "lengthOfMatch": 4,
+      "numberOfMatches": 12,
+      "name": "Curb FFA",
+      "signUpWaitTime": 300,
+      "map": "Curb",
+      "minPlayers": 8,
+      "maxPlayers": 12,
+      "variant": "CLASSIC",
+      "schedule": "0 0 20 * * SAT"
+    },
+    "participants": [
+      {
+        "tagProId": "ptVKkLNzHZrAZrgzuCM3AKN814XAOIan",
+        "name": "zrs",
+        "signUp": 1566673273124
+      }
+    ],
+    "state": "NOT_ENOUGH_MEMBERS",
+    "startTime": 1566673200000,
+    "completedMatches": []
+  },
+  {
+    "options": {
+      "serverId": "abb1f9f7c95a",
+      "caps": 2,
+      "lengthOfMatch": 8,
+      "numberOfMatches": 8,
+      "name": "Plasma FFA",
+      "signUpWaitTime": 300,
+      "map": "Plasma",
+      "minPlayers": 8,
+      "maxPlayers": 12,
+      "variant": "CLASSIC",
+      "schedule": "0 0 20 * * SUN"
+    },
+    "participants": [
+      {
+        "tagProId": "9Gs65P974f44mjCnosbe2lilZKNiODTe",
+        "name": "LIFE",
+        "signUp": 1566759675795
+      },
+      {
+        "tagProId": "TseSAGB1i54jcvg01ky_tsFoDXuQkd7t",
+        "name": "Q-Dex",
+        "signUp": 1566759677486
+      },
+      {
+        "tagProId": "ePf8NcyhL-WnAMzfV_lGgq5Gk-S5ZWk3",
+        "name": "teoretyczny",
+        "signUp": 1566759693549
+      },
+      {
+        "tagProId": "UD_B-8DFSzp2kG8ckgVxVEg0PSGEyuHp",
+        "name": "Jerry.",
+        "signUp": 1566759695533
+      },
+      {
+        "tagProId": "AkPCn8yr52DEEnu7YpOSbVfJjds_LuUR",
+        "name": "Comakip",
+        "signUp": 1566759718911
+      },
+      {
+        "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
+        "name": ".",
+        "signUp": 1566759892857
+      }
+    ],
+    "state": "NOT_ENOUGH_PARTICIPANTS",
+    "startTime": 1566759600001,
+    "completedMatches": []
+  }
+]

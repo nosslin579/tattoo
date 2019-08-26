@@ -8,11 +8,16 @@ import java.util.Date;
 public final class Participant {
   private final String tagProId;
   private final String name;
-  private final Date signUp = new Date();
+  private final Date signUp;
 
-  public Participant(String id, String name) {
+  public Participant(String id, String name, Date signUp) {
     this.tagProId = id;
     this.name = name;
+    this.signUp = signUp;
+  }
+
+  public Participant(String id, String name) {
+    this(id, name, new Date());
   }
 
   public String getTagProId() {
