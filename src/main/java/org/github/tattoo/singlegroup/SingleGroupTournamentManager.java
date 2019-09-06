@@ -1,5 +1,6 @@
 package org.github.tattoo.singlegroup;
 
+import org.github.tattoo.TournamentException;
 import org.github.tattoo.Util;
 import org.github.tattoo.groupsocket.Group;
 import org.github.tattoo.groupsocket.GroupCommand;
@@ -34,12 +35,10 @@ public class SingleGroupTournamentManager {
       Executors.newSingleThreadScheduledExecutor().schedule(thread::interrupt, 3, TimeUnit.HOURS);
 
       group.getChatListener().addListener(new CurrentStateListener(cmd, tournament));
-      startSignUpPeriod(tournament, group);
-      Util.sleepSeconds(tournament.getOptions().getSignUpWaitTime());
 
-      TournamentState stateAfterClosingSignUp = closeSignUp(tournament, group);
-      tournament.setState(stateAfterClosingSignUp);
-      if (stateAfterClosingSignUp != TournamentState.SIGN_UP_CLOSED) {
+      TournamentState stateAfterSignUp = signUpPlayers(tournament, group);
+      tournament.setState(stateAfterSignUp);
+      if (stateAfterSignUp != TournamentState.SIGN_UP_CLOSED) {
         cmd.disconnect();
         return tournament;
       }
@@ -65,13 +64,19 @@ public class SingleGroupTournamentManager {
     return tournament;
   }
 
-  public void startSignUpPeriod(SingleGroupTournament tournament, Group group) {
+  public TournamentState signUpPlayers(SingleGroupTournament tournament, Group group) {
     tournament.setState(TournamentState.SIGN_UP_OPEN);
     group.getChatListener().addListener(new SignUpChatListener(tournament, group));
     group.getChatListener().addListener(new SpectatorChatListener(group));
-  }
 
-  public TournamentState closeSignUp(SingleGroupTournament tournament, Group group) {
+    synchronized (tournament) {
+      try {
+        tournament.wait(TimeUnit.SECONDS.toMillis((tournament.getOptions().getSignUpWaitTime())));
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new TournamentException("Interrupted while waiting for signups", e);
+      }
+    }
     log.info("Closing sign up");
 
     group.getChatListener().removeListener(SignUpChatListener.class);

@@ -52,8 +52,8 @@ public class SingleGroupTest {
   @Test
   public void testMatchResult() throws InterruptedException {
     TournamentOptions options = new TournamentOptions();
-    options.setSignUpWaitTime(10);
     options.setNumberOfMatches(5);
+    options.setMaxPlayers(10);
     SingleGroupTournament tournament = new SingleGroupTournament(options);
     CompletableFuture.supplyAsync(() -> singleGroupTournamentManager.runTournament(tournament), Executors.newSingleThreadExecutor());
 
