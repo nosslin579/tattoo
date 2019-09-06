@@ -176,13 +176,13 @@ public class MatchManager {
     group.getCommand().chat("Ready?");
 
     ChatEmitterListener chatListener = group.getChatListener();
-    ReadyChatListener readyChatListener = new ReadyChatListener(match);
+    ReadyChatListener readyChatListener = new ReadyChatListener(match, group);
     chatListener.addListener(readyChatListener);
 
     tournament.setState(TournamentState.ASK_READY_FOR_LAUNCH);
     synchronized (match) {
       try {
-        match.wait(TimeUnit.SECONDS.toMillis(30));
+        match.wait(TimeUnit.SECONDS.toMillis(60));
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         throw new TournamentException("Interrupted while waiting for ready", e);
