@@ -31,7 +31,7 @@ public class TournamentController {
 
   @RequestMapping(value = "/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public TournamentOptions[] getTournamentOptions() {
-    return manager.getTournamentOptions();
+    return manager.getSchedule();
   }
 
   @RequestMapping(value = "/result", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

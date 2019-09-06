@@ -15,7 +15,6 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -37,16 +36,35 @@ public class TattooManager {
 
   private final ExecutorService onDemandTournamentPool = Executors.newSingleThreadExecutor();
   private final List<SingleGroupTournament> tournaments = Collections.synchronizedList(new ArrayList<>());
-  private final Gson gson = new GsonBuilder()
-      .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-      .create();
+  private final Gson gson;
+  private final TournamentOptions[] schedule;
+
+  public TattooManager() {
+    gson = new GsonBuilder()
+        .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
+        .create();
+
+    try {
+      FileReader reader = new FileReader("tournaments.json");
+      SingleGroupTournament[] tournaments = gson.fromJson(reader, SingleGroupTournament[].class);
+      reader.close();
+      this.tournaments.addAll(Arrays.asList(tournaments));
+    } catch (Exception e) {
+      log.error("Failed to load previous tournaments", e);
+    }
+
+    try {
+      FileReader reader = new FileReader("schedule.json");
+      this.schedule = gson.fromJson(reader, TournamentOptions[].class);
+      reader.close();
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to fetch schedule", e);
+    }
+  }
 
   @PostConstruct
-  public void init() throws FileNotFoundException {
-    SingleGroupTournament[] tournaments = gson.fromJson(new FileReader("tournaments.json"), SingleGroupTournament[].class);
-    this.tournaments.addAll(Arrays.asList(tournaments));
-
-    for (TournamentOptions to : getTournamentOptions()) {
+  public void scheduleTournamnets() {
+    for (TournamentOptions to : schedule) {
       log.info("Scheduling tournament {}", to);
       taskScheduler.schedule(() -> startTournament(to), new CronTrigger(to.getSchedule()));
     }
@@ -58,11 +76,13 @@ public class TattooManager {
   }
 
   private void startTournament(TournamentOptions options) {
-    SingleGroupTournament tournament = new SingleGroupTournament(options);
-    tournaments.add(tournament);
     try {
+      SingleGroupTournament tournament = new SingleGroupTournament(options);
+      tournaments.add(tournament);
       singleGroupTournamentManager.runTournament(tournament);
-      gson.toJson(tournaments, new FileWriter("tournaments.json"));
+      FileWriter writer = new FileWriter("tournaments.json");
+      gson.toJson(tournaments, writer);
+      writer.close();
     } catch (Exception e) {
       log.error("Failed to run tournament {}", options, e);
     }
@@ -72,12 +92,8 @@ public class TattooManager {
     return tournaments;
   }
 
-  public TournamentOptions[] getTournamentOptions() {
-    try {
-      return gson.fromJson(new FileReader("schedule.json"), TournamentOptions[].class);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException("Failed to fetch schedule", e);
-    }
+  public TournamentOptions[] getSchedule() {
+    return schedule;
   }
 
   public Result[] getResults(int limit) {
