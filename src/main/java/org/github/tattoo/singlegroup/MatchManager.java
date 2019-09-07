@@ -23,16 +23,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 
 @Component
 public class MatchManager {
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-  private final Comparator<ParticipantResult> noop = (o1, o2) -> 0;
 
   @Autowired
   CapResultCollector capResultCollector;
@@ -80,7 +77,6 @@ public class MatchManager {
 
     //set options
     upcoming.setNumber(tournament.getCompletedMatches().size() + 1);
-    upcoming.setQualification(isNextMatchQualification(tournament));
     upcoming.setMap(tournament.getOptions().getMap());
     upcoming.setMaxLength(tournament.getOptions().getLengthOfMatch());
     upcoming.setCapLimit(tournament.getOptions().getCaps());
@@ -96,17 +92,7 @@ public class MatchManager {
         .map(Member.IN_HERE::equals)
         .orElse(false);
 
-    //sorting, decides who is going to play in the next match, based on previous matches
-    List<Participant> qualified = ResultUtil.getParticipantResults(tournament)
-        .stream()
-        .limit(upcoming.isQualification() ? 99 : 8) //everyone is considered qualified if qualification match
-        .map(ParticipantResult::getParticipant)
-        .collect(Collectors.toList());
-
-    Comparator<ParticipantResult> byMatchesPlayed = comparingInt(ParticipantResult::getMatchesPlayed);
-
-    Comparator<ParticipantResult> byRanking = comparing((ParticipantResult pr) -> qualified.contains(pr.getParticipant())).reversed()//qualified players goes first
-        .thenComparing(upcoming.isQualification() ? byMatchesPlayed : noop)//least matches played goes first, only if qualification match
+    Comparator<ParticipantResult> byRanking = comparingInt(ParticipantResult::getMatchesPlayed)//least matches played goes first
         .thenComparing(comparingInt(ParticipantResult::getPoints).reversed()) //most points goes first
         .thenComparing(comparingInt(ParticipantResult::getCapsScored).reversed()) //most caps scored goes first
         .thenComparing(ParticipantResult::getCapsConceded) //least caps conceded goes goes first
@@ -128,20 +114,6 @@ public class MatchManager {
 
     return upcoming;
   }
-
-  private boolean isNextMatchQualification(SingleGroupTournament tournament) {
-    //todo: move hardcoded values to TournamentOptions
-    int matchNr = tournament.getCompletedMatches().size() + 1;
-    int participants = tournament.getParticipants().size();
-
-    //8 participants or less can't have any qualification
-    boolean exactly9 = participants == 9 && matchNr <= 5;
-    boolean exactly10 = participants == 10 && matchNr <= 4;
-    boolean above11 = participants >= 11 && matchNr <= 3;
-
-    return exactly9 || exactly10 || above11;
-  }
-
 
   private void setupMatch(Match match, Group group, SingleGroupTournament tournament) {
     for (Participant player : match.getBlueTeam().getPlayers()) {
@@ -170,8 +142,7 @@ public class MatchManager {
   private boolean isPLayersReady(SingleGroupTournament tournament, Match match, Group group) {
     log.info("Launching");
 
-    String gameType = match.isQualification() ? "qualification-game " : "end-game ";
-    String message = "Launching " + gameType + match.getNumber() + " of " + tournament.getOptions().getNumberOfMatches();
+    String message = "Launching " + match.getNumber() + " of " + tournament.getOptions().getNumberOfMatches();
     group.getCommand().chat(message);
     group.getCommand().chat("Ready?");
 

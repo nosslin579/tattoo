@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class SingleGroupTournament {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
+  private final transient Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final TournamentOptions options;
   private final List<Participant> participants = Collections.synchronizedList(new ArrayList<>());

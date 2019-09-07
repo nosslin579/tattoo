@@ -6,6 +6,7 @@ import org.github.tattoo.singlegroup.SingleGroupTournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,8 +26,13 @@ public class TournamentController {
   }
 
   @RequestMapping(value = "/tournament", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void startTournament(HttpEntity<TournamentOptions> entity) {
-    manager.startTournamentAsync(entity.getBody());
+  public ResponseEntity<Void> startTournament(HttpEntity<TournamentOptions> entity) {
+    TournamentOptions options = entity.getBody();
+    if (options == null || options.getSignUpWaitTime() > 600) {
+      return ResponseEntity.badRequest().build();
+    }
+    manager.startTournamentAsync(options);
+    return ResponseEntity.ok().build();
   }
 
   @RequestMapping(value = "/schedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

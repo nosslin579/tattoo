@@ -236,7 +236,7 @@ public class SocketFactory {
   private void onMemberLeave(Object[] objects, Map<String, Member> members) {
     final JSONObject chatObject = (JSONObject) objects[0];
     Member member = gson.fromJson(chatObject.toString(), Member.class);
-    log.info("Member leaving:{}", member.getName());
+    log.info("Member leaving, name:{} id:{}", member.getName(), member.getId());
     members.remove(member.getId());
   }
 }

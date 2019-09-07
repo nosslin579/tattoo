@@ -1,6 +1,5 @@
 package org.github.tattoo.singlegroup;
 
-import org.github.tattoo.TournamentException;
 import org.github.tattoo.groupsocket.ChatListener;
 import org.github.tattoo.groupsocket.Group;
 import org.github.tattoo.groupsocket.model.ChatMessage;
@@ -9,8 +8,9 @@ import org.github.tattoo.singlegroup.model.Participant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +19,7 @@ public class SignUpChatListener implements ChatListener {
   private final SingleGroupTournament tournament;
   private final Group group;
   private final Set<String> starts = ConcurrentHashMap.newKeySet();
+  private final Map<String, Instant> coolDowns = new ConcurrentHashMap<>();
 
 
   public SignUpChatListener(SingleGroupTournament tournament, Group group) {
@@ -28,70 +29,78 @@ public class SignUpChatListener implements ChatListener {
 
   @Override
   public void onMessage(ChatMessage message) {
-    String from = message.getFrom();
     try {
+      String from = message.getFrom() == null ? "" : message.getFrom();
+
+      Instant coolDown = coolDowns.getOrDefault(from, Instant.EPOCH);
+      coolDowns.put(from, Instant.now().plusSeconds(1));
+      if (coolDown.isAfter(Instant.now())) {
+        return;
+      }
 
       List<Participant> participants = tournament.getParticipants();
-      for (Participant p : participants) {
-        String tagProId = p.getTagProId();
-        if (group.getMembers().stream().map(Member::getId).noneMatch(tagProId::equals)) {
-          log.info("Member left, cancel sign up {}", p.getName());
-          cancelSignUp(p.getTagProId(), tournament);
-        }
+
+      //check if any participant has left
+      starts.removeIf(tagProId -> group.getMembers().stream().map(Member::getId).noneMatch(tagProId::equals));
+      if (participants.removeIf(p -> group.getMembers().stream().map(Member::getId).noneMatch(p.getTagProId()::equals))) {
+          log.info("Member left, sign up canceled");
       }
 
       if ("join".equals(message.getMessage())) {
-        Member member = group.getMemberByName(from).orElseThrow(() -> new TournamentException("Member not found"));
-        signUp(member, tournament);
-        group.getCommand().chat(from + " signed up");
-      } else if ("leave".equals(message.getMessage())) {
-        Member member = group.getMemberByName(from).orElseThrow(() -> new TournamentException("Member not found"));
-        cancelSignUp(member.getId(), tournament);
-        group.getCommand().chat(from + " cancelled");
+        signUp(from);
       } else if ("startearly".equals(message.getMessage())) {
-        String memberId = group.getMemberByName(from).orElseThrow(() -> new TournamentException("Member not found")).getId();
-        if (participants.stream().map(Participant::getTagProId).anyMatch(memberId::equals)) {
-          starts.add(memberId);
-          if (starts.size() >= 4 && starts.size() == participants.size()) {
-            synchronized (tournament) {
-              tournament.notifyAll();
-            }
-          }
-        }
-
-        group.getCommand().chat(from + " cancelled");
+        startEarly(from, participants);
       }
     } catch (Exception e) {
-      log.error("Sign up failed, {}", from, e);
-      group.getCommand().chat(e.getMessage());
+      log.error("Handle sign up message failed, {} {}", message.getMessage(), message.getFrom(), e);
     }
   }
 
-  private void signUp(Member member, SingleGroupTournament tournament) {
+  private void signUp(String from) {
+    Member member = group.getMemberByName(from).orElse(null);
+    if (member == null) {
+      group.getCommand().chat("Sign up failed, " + from + " not found");
+      return;
+    }
     Participant participant = new Participant(member.getId(), member.getName());
     if (member.getName().equals("Some Ball")) {
-      throw new TournamentException("Cant join with that name");
+      group.getCommand().chat("Sign up failed, cant join as Some Ball");
+      return;
     }
-    List<Participant> participants = tournament.getParticipants();
+    List<Participant> participants = this.tournament.getParticipants();
     if (participants.contains(participant)) {
-      throw new TournamentException("Can't sign up twice");
+      group.getCommand().chat("Sign up failed, can't sign up twice");
+      return;
     }
-    if (participants.size() == tournament.getOptions().getMaxPlayers()) {
-      throw new TournamentException("Tournament full");
+    if (participants.size() == this.tournament.getOptions().getMaxPlayers()) {
+      group.getCommand().chat("Sign up failed, tournament full");
+      return;
     }
+
     participants.add(participant);
     log.info("Added participant: {}", member.getName());
+    group.getCommand().chat(from + " signed up");
 
-    if (participants.size() >= tournament.getOptions().getMaxPlayers()) {
-      synchronized (tournament) {
-        tournament.notifyAll();
+    if (participants.size() >= this.tournament.getOptions().getMaxPlayers()) {
+      synchronized (this.tournament) {
+        this.tournament.notifyAll();
       }
     }
   }
 
-  public void cancelSignUp(String tagProId, SingleGroupTournament tournament) {
-    tournament.getParticipants().removeIf(participant -> Objects.equals(participant.getTagProId(), tagProId));
-    starts.remove(tagProId);
+  private void startEarly(String from, List<Participant> participants) {
+    String memberId = group.getMemberByName(from).map(Member::getId).orElse(null);
+    if (memberId == null) {
+      group.getCommand().chat("Member not found");
+      return;
+    }
+    if (participants.stream().map(Participant::getTagProId).anyMatch(memberId::equals)) {
+      starts.add(memberId);
+      if (starts.size() >= 4 && starts.size() == participants.size()) {
+        synchronized (tournament) {
+          tournament.notifyAll();
+        }
+      }
+    }
   }
-
 }

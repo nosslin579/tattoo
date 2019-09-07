@@ -1,11 +1,21 @@
 "use strict";
 
-function startTournament() {
-    alert("This feature coming soon")
-}
-
-angular.module('tournamentApp', []).controller('TournamentController', function ($http) {
+angular.module('tournamentApp', []).controller('TournamentController', function ($scope, $http) {
     var that = this;
+
+    $scope.startTournament = function () {
+        $http(
+            {
+                url: '/tournament',
+                dataType: 'json',
+                method: 'POST',
+                data: {},
+                headers: {"Content-Type": "application/json"}
+            })
+            .then(function (response) {
+                console.log("Tournament started", response);
+            });
+    };
 
     $http.get('/tournament')
         .then(function (response) {
@@ -14,7 +24,6 @@ angular.module('tournamentApp', []).controller('TournamentController', function 
 
     $http.get('/result')
         .then(function (response) {
-            console.log("asdf", response.data);
             that.resultList = response.data;
         });
 
@@ -31,23 +40,6 @@ angular.module('tournamentApp').filter('cronToHumanReadable', function () {
 });
 
 
-//*
-// : [{name: "Atlanta, GA", value: "01b011ac8116"}, {name: "New York, NY", value: "9a6e1bc2c4c8"},…]
-//
-//     0: {name: "Atlanta, GA", value: "01b011ac8116"}
-//     1: {name: "New York, NY", value: "9a6e1bc2c4c8"}
-//     2: {name: "Miami, FL", value: "af82be9af5aa"}
-//     3: {name: "Dallas, TX", value: "040f9334d182"}
-//     4: {name: "London, UK", value: "abb1f9f7c95a"}
-//     5: {name: "Chicago, IL", value: "26611098815d"}
-//     6: {name: "Los Angeles, CA", value: "aef366ca693c"}
-//     7: {name: "San Francisco, CA", value: "41adffac6f58"}
-//     8: {name: "Seattle, WA", value: "ab0118cf5df3"}
-//     9: {name: "Paris, FR", value: "bd408b384a78"}
-//     10: {name: "Frankfurt, DE", value: "c0ba0ac39a00"}
-//     11: {name: "Sydney, AU", value: "fd140ca477c9"}
-//     12: {name: "Amsterdam, NL", value: "f395d5bf706f"}
-//     13: {name: "Toronto, CAN", value: "fcdba9650e5e"*/
 angular.module('tournamentApp').filter('tagProServer', function () {
     return function (serverId) {
         switch (serverId) {

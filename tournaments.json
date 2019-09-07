@@ -10,23 +10,22 @@
       "map": "EMERALD",
       "minPlayers": 2,
       "maxPlayers": 12,
-      "variant": "CLASSIC",
-      "schedule": null
+      "variant": "CLASSIC"
     },
     "participants": [
       {
         "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
         "name": ".",
-        "signUp": 1566583239001
+        "signUp": "Aug 23, 2019 8:00:39 PM"
       },
       {
         "tagProId": "Za8Ky9Rltuz4_DyN2z02hpaFT-5ivmhW",
         "name": "Tattoo",
-        "signUp": 1566583243803
+        "signUp": "Aug 23, 2019 8:00:43 PM"
       }
     ],
     "state": "ENDED",
-    "startTime": 1566583211187,
+    "startTime": "Aug 23, 2019 8:00:11 PM",
     "completedMatches": [
       {
         "map": "EMERALD",
@@ -38,7 +37,7 @@
             {
               "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
               "name": ".",
-              "signUp": 1566583239001
+              "signUp": "Aug 23, 2019 8:00:39 PM"
             }
           ],
           "caps": 1,
@@ -50,14 +49,13 @@
             {
               "tagProId": "Za8Ky9Rltuz4_DyN2z02hpaFT-5ivmhW",
               "name": "Tattoo",
-              "signUp": 1566583243803
+              "signUp": "Aug 23, 2019 8:00:43 PM"
             }
           ],
           "caps": 0,
           "name": "LLGYQVUAVVLF",
           "teamId": 2
-        },
-        "qualification": false
+        }
       },
       {
         "map": "EMERALD",
@@ -69,7 +67,7 @@
             {
               "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
               "name": ".",
-              "signUp": 1566583239001
+              "signUp": "Aug 23, 2019 8:00:39 PM"
             }
           ],
           "caps": 1,
@@ -81,35 +79,15 @@
             {
               "tagProId": "Za8Ky9Rltuz4_DyN2z02hpaFT-5ivmhW",
               "name": "Tattoo",
-              "signUp": 1566583243803
+              "signUp": "Aug 23, 2019 8:00:43 PM"
             }
           ],
           "caps": 0,
           "name": "XIQEIYBNNUYP",
           "teamId": 2
-        },
-        "qualification": false
+        }
       }
     ]
-  },
-  {
-    "options": {
-      "serverId": "abb1f9f7c95a",
-      "caps": 2,
-      "lengthOfMatch": 10,
-      "numberOfMatches": 8,
-      "name": "Atomic FFA",
-      "signUpWaitTime": 300,
-      "map": "Atomic",
-      "minPlayers": 8,
-      "maxPlayers": 12,
-      "variant": "CLASSIC",
-      "schedule": "0 0 20 * * FRI"
-    },
-    "participants": [],
-    "state": "NOT_ENOUGH_MEMBERS",
-    "startTime": 1566586800000,
-    "completedMatches": []
   },
   {
     "options": {
@@ -129,11 +107,11 @@
       {
         "tagProId": "ptVKkLNzHZrAZrgzuCM3AKN814XAOIan",
         "name": "zrs",
-        "signUp": 1566673273124
+        "signUp": "Aug 24, 2019 9:01:13 PM"
       }
     ],
     "state": "NOT_ENOUGH_MEMBERS",
-    "startTime": 1566673200000,
+    "startTime": "Aug 24, 2019 9:00:00 PM",
     "completedMatches": []
   },
   {
@@ -154,36 +132,78 @@
       {
         "tagProId": "9Gs65P974f44mjCnosbe2lilZKNiODTe",
         "name": "LIFE",
-        "signUp": 1566759675795
+        "signUp": "Aug 25, 2019 9:01:15 PM"
       },
       {
         "tagProId": "TseSAGB1i54jcvg01ky_tsFoDXuQkd7t",
         "name": "Q-Dex",
-        "signUp": 1566759677486
+        "signUp": "Aug 25, 2019 9:01:17 PM"
       },
       {
         "tagProId": "ePf8NcyhL-WnAMzfV_lGgq5Gk-S5ZWk3",
         "name": "teoretyczny",
-        "signUp": 1566759693549
+        "signUp": "Aug 25, 2019 9:01:33 PM"
       },
       {
         "tagProId": "UD_B-8DFSzp2kG8ckgVxVEg0PSGEyuHp",
         "name": "Jerry.",
-        "signUp": 1566759695533
+        "signUp": "Aug 25, 2019 9:01:35 PM"
       },
       {
         "tagProId": "AkPCn8yr52DEEnu7YpOSbVfJjds_LuUR",
         "name": "Comakip",
-        "signUp": 1566759718911
+        "signUp": "Aug 25, 2019 9:01:58 PM"
       },
       {
         "tagProId": "ZJApetqOYncN2OCDUhZMEshN3yCmrldn",
         "name": ".",
-        "signUp": 1566759892857
+        "signUp": "Aug 25, 2019 9:04:52 PM"
       }
     ],
     "state": "NOT_ENOUGH_PARTICIPANTS",
-    "startTime": 1566759600001,
+    "startTime": "Aug 25, 2019 9:00:00 PM",
+    "completedMatches": []
+  },
+  {
+    "options": {
+      "serverId": "abb1f9f7c95a",
+      "caps": 1,
+      "lengthOfMatch": 1,
+      "numberOfMatches": 2,
+      "name": "Test1576644651",
+      "signUpWaitTime": 60,
+      "map": "EMERALD",
+      "minPlayers": 2,
+      "maxPlayers": 12,
+      "variant": "CLASSIC"
+    },
+    "participants": [],
+    "state": "NOT_ENOUGH_MEMBERS",
+    "startTime": "Sep 7, 2019 7:39:09 PM",
+    "completedMatches": []
+  },
+  {
+    "options": {
+      "serverId": "abb1f9f7c95a",
+      "caps": 1,
+      "lengthOfMatch": 1,
+      "numberOfMatches": 2,
+      "name": "Test519665511",
+      "signUpWaitTime": 60,
+      "map": "EMERALD",
+      "minPlayers": 2,
+      "maxPlayers": 12,
+      "variant": "CLASSIC"
+    },
+    "participants": [
+      {
+        "tagProId": "Za8Ky9Rltuz4_DyN2z02hpaFT-5ivmhW",
+        "name": "Tattoo",
+        "signUp": "Sep 7, 2019 7:42:20 PM"
+      }
+    ],
+    "state": "NOT_ENOUGH_MEMBERS",
+    "startTime": "Sep 7, 2019 7:42:06 PM",
     "completedMatches": []
   }
 ]

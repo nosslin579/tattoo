@@ -90,14 +90,14 @@ public class SingleGroupTest {
 
     ParticipantResult winner = ResultUtil.getParticipantResults(tournament).get(0);
     ParticipantResult runnerUp = ResultUtil.getParticipantResults(tournament).get(1);
-    assertEquals(5, winner.getMatchesPlayed());
-    assertEquals(5, runnerUp.getMatchesPlayed());
+    assertEquals(4, winner.getMatchesPlayed());
+    assertEquals(4, runnerUp.getMatchesPlayed());
     assertEquals("Wrong winner", "9", winner.getParticipant().getName());
-    assertEquals("Wrong runner up", "8", runnerUp.getParticipant().getName());
-    assertEquals(795, winner.getCapsScored());
-    assertEquals(748, runnerUp.getCapsScored());
-    assertEquals(15, winner.getPoints());
-    assertEquals(9, runnerUp.getPoints());
+    assertEquals("Wrong runner up", "1", runnerUp.getParticipant().getName());
+    assertEquals(592, winner.getCapsScored());
+    assertEquals(523, runnerUp.getCapsScored());
+    assertEquals(12, winner.getPoints());
+    assertEquals(12, runnerUp.getPoints());
 
     Match match1 = completedMatches.get(0);
     assertEquals(164, match1.getRedTeam().getCaps());

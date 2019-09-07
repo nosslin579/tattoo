@@ -2,7 +2,6 @@ package org.github.tattoo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
 import org.github.tattoo.singlegroup.ResultUtil;
 import org.github.tattoo.singlegroup.SingleGroupTournament;
 import org.github.tattoo.singlegroup.SingleGroupTournamentManager;
@@ -18,12 +17,12 @@ import javax.annotation.PostConstruct;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 @Component
 public class TattooManager {
@@ -34,21 +33,22 @@ public class TattooManager {
   @Autowired
   private TaskScheduler taskScheduler;
 
-  private final ExecutorService onDemandTournamentPool = Executors.newSingleThreadExecutor();
+  private final ThreadPoolExecutor onDemandPool = new ThreadPoolExecutor(1, 1, 1L, TimeUnit.SECONDS, new SynchronousQueue<>());
+  ;
   private final List<SingleGroupTournament> tournaments = Collections.synchronizedList(new ArrayList<>());
   private final Gson gson;
   private final TournamentOptions[] schedule;
 
   public TattooManager() {
-    gson = new GsonBuilder()
-        .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-        .create();
+    gson = new GsonBuilder().setPrettyPrinting().create();
 
     try {
       FileReader reader = new FileReader("tournaments.json");
-      SingleGroupTournament[] tournaments = gson.fromJson(reader, SingleGroupTournament[].class);
+      SingleGroupTournament[] fromJson = gson.fromJson(reader, SingleGroupTournament[].class);
       reader.close();
-      this.tournaments.addAll(Arrays.asList(tournaments));
+      Stream.of(fromJson)
+          .filter(singleGroupTournament -> !singleGroupTournament.getParticipants().isEmpty())
+          .forEach(tournaments::add);
     } catch (Exception e) {
       log.error("Failed to load previous tournaments", e);
     }
@@ -72,7 +72,7 @@ public class TattooManager {
 
   public void startTournamentAsync(TournamentOptions options) {
     log.info("Starting tournament on demand, {}", options);
-    onDemandTournamentPool.submit(() -> startTournament(options));
+    onDemandPool.submit(() -> startTournament(options));
   }
 
   private void startTournament(TournamentOptions options) {

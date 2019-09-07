@@ -7,7 +7,6 @@ public class Match {
   private int number;
   private Team redTeam = new Team(TeamId.RED);
   private Team blueTeam = new Team(TeamId.BLUE);
-  private boolean qualification;
 
   public Team getTeam(int teamId) {
     if (teamId == TeamId.RED) {
@@ -66,11 +65,4 @@ public class Match {
     this.number = number;
   }
 
-  public boolean isQualification() {
-    return qualification;
-  }
-
-  public void setQualification(boolean qualification) {
-    this.qualification = qualification;
-  }
 }
