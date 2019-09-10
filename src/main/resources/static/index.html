@@ -24,7 +24,7 @@
         <div class="col-sm">
             <h3>Instructions</h3>
 
-            <p>Tattoo is a fully automated TagPro tournament organizer. It will handle sign up, assign players to correct team and keep track om score. New tournament is started via configurable schedule. To know the score it uses http://tagpro.eu so make sure you have it installed. It can handle 8-12 sign ups, organized in a single group. If more then 8 players signed up there will be 3 - 5 qualification games. Points collected during these games will be carried over to the end games.</p>
+            <p>Tattoo is a fully automated TagPro tournament organizer. It will handle sign up, assign players to correct team and keep track om score. New tournament is started via configurable schedule. To know the score it uses http://tagpro.eu so make sure you have it installed. It can handle 8-12 sign ups, organized in a single group.</p>
 
             <p>To join a tournament, join the group and type `join`. It is not possible to join as Some Ball so make sure you are logged in and have a unique name. If you get disconnected just join the group again. Current result is announced after each game and can also be viewed below.</p>
         </div>
@@ -32,10 +32,12 @@
         <div class="col-sm">
             <h3>Commands</h3>
             <ul class="list-group">
-                <li class="list-group-item">join - Sign up</li>
-                <li class="list-group-item">leave - Cancel sign up</li>
-                <li class="list-group-item">spec - Spectate</li>
-                <li class="list-group-item">poke - Status</li>
+                <li class="list-group-item">join - Available during sign up, if you disconnect during sign up it will be cancelled</li>
+                <li class="list-group-item">ready - When Tattoo ask if ready, everyone needs to answer ready (r, rdy or ready)</li>
+                <li class="list-group-item">checkscore - After each game Tattoo checks tagpro.eu for score, if it fails game must be replayed</li>
+                <li class="list-group-item">restartgame - After each game if tagpro.eu check failed, need at least 5 players to type this</li>
+                <li class="list-group-item">startearly - During sign up, if players want to start with current sign ups. Need at least 4 players and all sign ups to type this.</li>
+                <li class="list-group-item">poke - Current status according to Tattoo, mostly used for testing and troubleshooting</li>
             </ul>
         </div>
     </div>
