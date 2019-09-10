@@ -5,7 +5,6 @@ import org.github.tattoo.TournamentException;
 import org.github.tattoo.Util;
 import org.github.tattoo.groupsocket.ChatEmitterListener;
 import org.github.tattoo.groupsocket.Group;
-import org.github.tattoo.groupsocket.GroupCommand;
 import org.github.tattoo.groupsocket.SocketFactory;
 import org.github.tattoo.groupsocket.model.Member;
 import org.github.tattoo.singlegroup.model.Match;
@@ -17,13 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static java.util.Comparator.comparingInt;
 
@@ -49,23 +45,25 @@ public class MatchManager {
 
       tournament.setState(TournamentState.LAUNCHING);
       group.getCommand().launch();
+      group.getCommand().allowSelfAssignment();//only set when participant request it
       Util.sleepSeconds(2);
       Socket joinerSocket = socketFactory.joinJoinerSocket(group.getTagProCookie());
 
-      if (isParticipantsAtLocation(match, group, Member.IN_GAME, 60)) {
-        joinerSocket.disconnect();
-        tournament.setState(TournamentState.MATCH_IN_PROGRESS);
-      } else {
-        group.getCommand().chat("Match did not start, replaying");
-        joinerSocket.disconnect();
-        continue;
+      AfterMatchChatListener listener = new AfterMatchChatListener(capResultCollector, tournament, group, match);
+      group.getChatListener().addListener(listener);
+      tournament.setState(TournamentState.MATCH_IN_PROGRESS);
+      synchronized (listener) {
+        try {
+          listener.wait(TimeUnit.MINUTES.toMillis(match.getMaxLength() + 5));
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new TournamentException("Interrupted while waiting for match to finish", e);
+        }
       }
 
-      if (isParticipantsAtLocation(match, group, Member.IN_HERE, 60 * match.getMaxLength() + 60)) {
-        tournament.setState(TournamentState.MATCH_FINISHED);
-        updateScore(tournament, match, group);
-      }
+      group.getChatListener().removeListener(listener);
       joinerSocket.disconnect();//just in case
+      group.getCommand().disallowSelfAssignment();
     }
     return ResultUtil.getParticipantResults(tournament);
   }
@@ -162,50 +160,5 @@ public class MatchManager {
 
     chatListener.removeListener(readyChatListener);
     return readyChatListener.isPlayersReady();
-  }
-
-  private boolean isParticipantsAtLocation(Match match, Group group, String location, int maxWaitSeconds) {
-    Instant threshHold = Instant.now().plusSeconds(maxWaitSeconds);
-
-    while (Instant.now().isBefore(threshHold)) {
-      Util.sleepSeconds(2);
-      long atLocation = Stream.of(match.getBlueTeam(), match.getRedTeam())
-          .flatMap(team -> team.getPlayers().stream())
-          .map(participant -> group.getMemberById(participant.getTagProId()))
-          .filter(Optional::isPresent)
-          .map(Optional::get)
-          .map(Member::getLocation)
-          .filter(location::equals)
-          .count();
-      double ratio = atLocation / (match.getRedTeam().getPlayers().size() + match.getRedTeam().getPlayers().size());
-      if (atLocation > 6 || ratio > 0.74d) {
-        log.info("Players at location {}", location);
-        return true;
-      }
-    }
-    log.warn("Location wait timeout {}", location);
-    return false;
-  }
-
-  private boolean updateScore(SingleGroupTournament tournament, Match match, Group group) {
-    tournament.setState(TournamentState.UPDATING_SCORE);
-    GroupCommand command = group.getCommand();
-    return capResultCollector.getCapResult(match)
-        .map(capResult -> {
-          log.info("Setting the score. {}", capResult);
-          tournament.setState(TournamentState.GOT_SCORE);
-          command.chat(capResult.toString());
-
-          match.getRedTeam().setCaps(capResult.getRedCaps());
-          match.getBlueTeam().setCaps(capResult.getBlueCaps());
-          tournament.getCompletedMatches().add(match);
-
-          ResultUtil.getReadableResult(tournament, 4).forEach(command::chat);
-          return true;
-        })
-        .orElseGet(() -> {
-          command.chat("Could not get cap result, ignoring match");
-          return false;
-        });
   }
 }

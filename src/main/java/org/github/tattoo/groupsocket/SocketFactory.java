@@ -64,8 +64,8 @@ public class SocketFactory {
 
     GroupCommand command = new GroupCommand(socket);
     pool.scheduleAtFixedRate(() -> command.touch(Member.IN_HERE), 5, 30, TimeUnit.SECONDS);
-    pool.scheduleAtFixedRate(command::switchToPug, 10, 99, TimeUnit.SECONDS);
-    pool.scheduleAtFixedRate(command::disallowSelfAssignment, 8, 99, TimeUnit.SECONDS);
+    pool.scheduleAtFixedRate(command::switchToPug, 5, 99, TimeUnit.SECONDS);
+    pool.schedule(command::disallowSelfAssignment, 4, TimeUnit.SECONDS);
 
 
     return new Group(name, group.getGroupId(), group.getTagProCookie(), members, socket, chatListener);

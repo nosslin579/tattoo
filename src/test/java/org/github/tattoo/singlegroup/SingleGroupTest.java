@@ -26,8 +26,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
+import static org.github.tattoo.singlegroup.AfterMatchChatListener.CHECKSCORE;
 import static org.github.tattoo.singlegroup.TournamentState.ASK_READY_FOR_LAUNCH;
 import static org.github.tattoo.singlegroup.TournamentState.ENDED;
+import static org.github.tattoo.singlegroup.TournamentState.GOT_SCORE;
 import static org.github.tattoo.singlegroup.TournamentState.MATCH_IN_PROGRESS;
 import static org.github.tattoo.singlegroup.TournamentState.SIGN_UP_OPEN;
 import static org.junit.Assert.assertEquals;
@@ -69,10 +71,10 @@ public class SingleGroupTest {
       waitForState(tournament, ASK_READY_FOR_LAUNCH);
       members.values().forEach(member -> chat(member.getName(), "ready"));
 
-      setAllMembers(Member.IN_GAME);
       waitForState(tournament, MATCH_IN_PROGRESS);
+      members.values().forEach(member -> chat(member.getName(), CHECKSCORE));
 
-      setAllMembers(Member.IN_HERE);
+      waitForState(tournament, GOT_SCORE, ENDED);
       waitForState(tournament, ASK_READY_FOR_LAUNCH, ENDED);
 
       Match match = tournament.getCompletedMatches().peekLast();
