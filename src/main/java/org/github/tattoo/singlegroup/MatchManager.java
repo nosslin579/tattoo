@@ -44,13 +44,12 @@ public class MatchManager {
       if (!isPLayersReady(tournament, match, group)) {
         group.getCommand().chat("Not ready?");
         group.getCommand().chat("Trying again");
-        setupMatch.shutdownNow();
+        setupMatch.shutdown();
         continue;
       }
 
       tournament.setState(TournamentState.LAUNCHING);
       group.getCommand().launch();
-//      group.getCommand().allowSelfAssignment();//only set when participant request it
       Util.sleepSeconds(5);
       Socket joinerSocket = socketFactory.joinJoinerSocket(group.getTagProCookie());
 
@@ -67,10 +66,9 @@ public class MatchManager {
       }
       group.getChatListener().removeListener(listener);
 
-      setupMatch.shutdownNow();
+      setupMatch.shutdown();
 
       joinerSocket.disconnect();//just in case
-      group.getCommand().disallowSelfAssignment();
     }
     return ResultUtil.getParticipantResults(tournament);
   }
@@ -124,21 +122,22 @@ public class MatchManager {
     ScheduledExecutorService checkPlayerTeamExecutor = Executors.newSingleThreadScheduledExecutor();
     checkPlayerTeamExecutor.scheduleAtFixedRate(() -> {
 
-      for (Team team : Arrays.asList(match.getBlueTeam(), match.getRedTeam())) {
-        for (Participant player : team.getPlayers()) {
-          group.getMemberById(player.getTagProId())
-              .map(Member::getTeam)
-              .filter(teamId -> teamId != team.getTeamId()) //actual != expected
-              .ifPresent(teamId -> group.getCommand().moveMemberToTeam(player.getTagProId(), team.getTeamId()));
+      for (Member member : group.getMembers()) {
+        if (member.isLeader() || "Some Ball".equals(member.getName())) {
+          //do nothing
+        } else if (match.getBlueTeam().getPlayers().stream().map(Participant::getTagProId).anyMatch(member.getId()::equals)) {
+          if (member.getTeam() != TeamId.BLUE) {
+            group.getCommand().moveMemberToTeam(member.getId(), TeamId.BLUE);
+          }
+        } else if (match.getRedTeam().getPlayers().stream().map(Participant::getTagProId).anyMatch(member.getId()::equals)) {
+          if (member.getTeam() != TeamId.RED) {
+            group.getCommand().moveMemberToTeam(member.getId(), TeamId.RED);
+          }
+        } else if (!member.isSpectator()) {
+          group.getCommand().moveMemberToTeam(member.getId(), TeamId.SPECTATOR);
         }
       }
-    }, 0, 1, TimeUnit.SECONDS);
-
-    tournament.getParticipants()
-        .stream()
-        .filter(p -> !match.getBlueTeam().getPlayers().contains(p))
-        .filter(p -> !match.getRedTeam().getPlayers().contains(p))
-        .forEach(participant -> group.getCommand().moveMemberToTeam(participant.getTagProId(), TeamId.WAITING));
+    }, 1, 1, TimeUnit.SECONDS);
 
     group.getCommand().setRedTeamName(match.getRedTeam().getName());
     group.getCommand().setBlueTeamName(match.getBlueTeam().getName());
@@ -148,6 +147,7 @@ public class MatchManager {
     group.getCommand().setSettingCaps(match.getCapLimit());
     group.getCommand().setServerSelect(true);
     group.getCommand().setServer(tournament.getOptions().getServerId());
+    group.getCommand().disallowSelfAssignment();
     return checkPlayerTeamExecutor;
   }
 
