@@ -10,14 +10,18 @@ import org.github.tattoo.groupsocket.model.Member;
 import org.github.tattoo.singlegroup.model.Match;
 import org.github.tattoo.singlegroup.model.Participant;
 import org.github.tattoo.singlegroup.model.ParticipantResult;
+import org.github.tattoo.singlegroup.model.Team;
 import org.github.tattoo.singlegroup.model.TeamId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -36,17 +40,18 @@ public class MatchManager {
     while (tournament.getCompletedMatches().size() < tournament.getOptions().getNumberOfMatches()) {
       Match match = createMatch(tournament, group);
 
-      setupMatch(match, group, tournament);
+      ScheduledExecutorService setupMatch = setupMatch(match, group, tournament);
       if (!isPLayersReady(tournament, match, group)) {
         group.getCommand().chat("Not ready?");
         group.getCommand().chat("Trying again");
+        setupMatch.shutdownNow();
         continue;
       }
 
       tournament.setState(TournamentState.LAUNCHING);
       group.getCommand().launch();
-      group.getCommand().allowSelfAssignment();//only set when participant request it
-      Util.sleepSeconds(2);
+//      group.getCommand().allowSelfAssignment();//only set when participant request it
+      Util.sleepSeconds(5);
       Socket joinerSocket = socketFactory.joinJoinerSocket(group.getTagProCookie());
 
       AfterMatchChatListener listener = new AfterMatchChatListener(capResultCollector, tournament, group, match);
@@ -60,8 +65,10 @@ public class MatchManager {
           throw new TournamentException("Interrupted while waiting for match to finish", e);
         }
       }
-
       group.getChatListener().removeListener(listener);
+
+      setupMatch.shutdownNow();
+
       joinerSocket.disconnect();//just in case
       group.getCommand().disallowSelfAssignment();
     }
@@ -113,13 +120,19 @@ public class MatchManager {
     return upcoming;
   }
 
-  private void setupMatch(Match match, Group group, SingleGroupTournament tournament) {
-    for (Participant player : match.getBlueTeam().getPlayers()) {
-      group.getCommand().moveMemberToTeam(player.getTagProId(), TeamId.BLUE);
-    }
-    for (Participant player : match.getRedTeam().getPlayers()) {
-      group.getCommand().moveMemberToTeam(player.getTagProId(), TeamId.RED);
-    }
+  private ScheduledExecutorService setupMatch(Match match, Group group, SingleGroupTournament tournament) {
+    ScheduledExecutorService checkPlayerTeamExecutor = Executors.newSingleThreadScheduledExecutor();
+    checkPlayerTeamExecutor.scheduleAtFixedRate(() -> {
+
+      for (Team team : Arrays.asList(match.getBlueTeam(), match.getRedTeam())) {
+        for (Participant player : match.getBlueTeam().getPlayers()) {
+          group.getMemberById(player.getTagProId())
+              .map(Member::getTeam)
+              .filter(teamId -> teamId != team.getTeamId())
+              .ifPresent(integer -> group.getCommand().moveMemberToTeam(player.getTagProId(), team.getTeamId()));
+        }
+      }
+    }, 0, 1, TimeUnit.SECONDS);
 
     tournament.getParticipants()
         .stream()
@@ -135,6 +148,7 @@ public class MatchManager {
     group.getCommand().setSettingCaps(match.getCapLimit());
     group.getCommand().setServerSelect(true);
     group.getCommand().setServer(tournament.getOptions().getServerId());
+    return checkPlayerTeamExecutor;
   }
 
   private boolean isPLayersReady(SingleGroupTournament tournament, Match match, Group group) {

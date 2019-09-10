@@ -9,9 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AfterMatchChatListener implements ChatListener {
   public static final String RESTARTGAME = "restartgame";
@@ -46,8 +48,17 @@ public class AfterMatchChatListener implements ChatListener {
         complete();
       }
     } else if (RESTARTGAME.equals(text)) {
+      if (Stream.of(match.getBlueTeam().getPlayers(), match.getRedTeam().getPlayers())
+          .flatMap(Collection::stream)
+          .noneMatch(participant -> participant.getName().equals(message.getFrom()))) {
+        log.warn("{} is not allowed to vote", message.getFrom());
+        return;
+      }
       votes.put(message.getFrom(), text);
-      if (votes.values().stream().filter(RESTARTGAME::equals).count() > 5) {
+      long restartGameVotes = this.votes.values().stream().filter(RESTARTGAME::equals).count();
+      log.info("Voting for restart game: {} total votes {}", message.getFrom(), restartGameVotes);
+      int playerSize = match.getBlueTeam().getPlayers().size() + match.getRedTeam().getPlayers().size();
+      if (restartGameVotes == playerSize || restartGameVotes >= 5) {
         complete();
       }
     }

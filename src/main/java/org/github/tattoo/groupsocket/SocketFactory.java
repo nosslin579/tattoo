@@ -79,8 +79,8 @@ public class SocketFactory {
     socket.io().on(Manager.EVENT_TRANSPORT, new SetCookieEmitterListener(tagProCookie));
     socket.on("connect", objects -> log.info("Connected to joiner {}", tagProCookie));
     socket.on("disconnect", objects -> log.info("Disconnect from joiner"));
-//    socket.on("FoundWorld", objects -> log.info("FoundWorld:{}", Arrays.toString(objects)));
-//        socket.on("WaitingForMembers", objects -> log.info("WaitingForMembers:{}", Arrays.toString(objects)));
+    socket.on("FoundWorld", objects -> log.info("FoundWorld:{}", Arrays.toString(objects)));
+    socket.on("WaitingForMembers", objects -> log.info("WaitingForMembers:{}", Arrays.toString(objects)));
     socket.on("CreatingWorld", objects -> log.info("CreatingWorld:{}", Arrays.toString(objects)));
     socket.on("GroupLeaderNotInTheJoiner", objects -> log.error("GroupLeaderNotInTheJoiner:{}", Arrays.toString(objects)));
     socket.on("port", objects -> log.info("port:{}", Arrays.toString(objects)));
