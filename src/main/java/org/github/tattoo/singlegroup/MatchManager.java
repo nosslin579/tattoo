@@ -125,11 +125,11 @@ public class MatchManager {
     checkPlayerTeamExecutor.scheduleAtFixedRate(() -> {
 
       for (Team team : Arrays.asList(match.getBlueTeam(), match.getRedTeam())) {
-        for (Participant player : match.getBlueTeam().getPlayers()) {
+        for (Participant player : team.getPlayers()) {
           group.getMemberById(player.getTagProId())
               .map(Member::getTeam)
-              .filter(teamId -> teamId != team.getTeamId())
-              .ifPresent(integer -> group.getCommand().moveMemberToTeam(player.getTagProId(), team.getTeamId()));
+              .filter(teamId -> teamId != team.getTeamId()) //actual != expected
+              .ifPresent(teamId -> group.getCommand().moveMemberToTeam(player.getTagProId(), team.getTeamId()));
         }
       }
     }, 0, 1, TimeUnit.SECONDS);
